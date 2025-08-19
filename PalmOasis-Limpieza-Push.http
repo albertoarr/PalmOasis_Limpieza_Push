@@ -1,0 +1,6 @@
+@PalmOasis_Limpieza_Push_HostAddress = http://localhost:5228
+
+GET {{PalmOasis_Limpieza_Push_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
