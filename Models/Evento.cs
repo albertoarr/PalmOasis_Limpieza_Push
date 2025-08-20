@@ -17,6 +17,6 @@ namespace PalmOasis_Limpieza_Push.Models
 		public string Usuario { get; set; } = string.Empty;
 
 		[MaxLength(255)]
-		public string Texto { get; set; } = string.Empty;
+		public string TextoEvento { get; set; } = string.Empty;
 	}
 }

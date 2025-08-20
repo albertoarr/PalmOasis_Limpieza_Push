@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Threading;
+using System.Collections.Generic;
 using Microsoft.Extensions.Configuration;
 using FirebaseAdmin;
 using FirebaseAdmin.Messaging;
@@ -9,11 +11,11 @@ namespace PalmOasis_Limpieza_Push.Services
 {
 	public class PushService : IPushService
 	{
-		public PushService(IConfiguration cfg) 
+		public PushService(IConfiguration cfg)
 		{
 			if (FirebaseApp.DefaultInstance is null)
 			{
-				var credsPath = cfg["Firebase:CredentialsFile"];
+				var credsPath = cfg["Firebase:CredentialsFile"] ?? "Secrets/firebase-admin.json";
 				FirebaseApp.Create(new AppOptions
 				{
 					Credential = GoogleCredential.FromFile(credsPath)
@@ -21,28 +23,19 @@ namespace PalmOasis_Limpieza_Push.Services
 			}
 		}
 
-
-		public Task SendRoomCleanedToTopicAsync(string topic, object dto, CancellationToken ct = default) {
-			var cadena = dto.GetType().GetProperty("Cadena")?.GetValue(dto)?.ToString() ?? "";
-			var ts = dto.GetType().GetProperty("TimestampUtc")?.GetValue(dto)?.ToString() ?? "";
+		public Task SendToTopicAsync(string topic, string text, DateTime tsUtc, CancellationToken ct = default)
+		{
+			var data = new Dictionary<string, string>
+			{
+				["text"] = text,
+				["ts"] = tsUtc.ToUniversalTime().ToString("o")
+			};
 
 			var msg = new Message
 			{
 				Topic = topic,
-
-				Notification = new Notification
-				{
-					Title = "Limpieza",
-					Body = cadena
-				},
-
-				Data = new Dictionary<string, string>
-				{
-					["text"] = cadena,
-					["ts"] = ts,
-					["type"] = "room_cleaned"
-				},
-
+				Notification = new Notification { Title = "Aviso", Body = text },
+				Data = data,
 				Android = new AndroidConfig
 				{
 					Priority = Priority.High,

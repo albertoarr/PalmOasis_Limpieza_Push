@@ -8,7 +8,7 @@ var builder = WebApplication.CreateBuilder(args);
 
 // Servicio de conexión a BD
 builder.Services.AddDbContext<LimpiezaContext>(options => 
-    options.UseSqlServer(builder.Configuration.GetConnectionString("Recibos")));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Default")));
 
 // Servicios del builder
 builder.Services.AddControllers();
