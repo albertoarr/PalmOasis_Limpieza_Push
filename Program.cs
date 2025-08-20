@@ -1,10 +1,21 @@
+using Microsoft.EntityFrameworkCore;
+using PalmOasis_Limpieza_Push.Services;
+using PalmOasis_Limpieza_Push.Models;
+using PalmOasis_Limpieza_Push.Models.Interfaces;
+
+
 var builder = WebApplication.CreateBuilder(args);
 
-// Add services to the container.
+// Servicio de conexión a BD
+builder.Services.AddDbContext<LimpiezaContext>(options => 
+    options.UseSqlServer(builder.Configuration.GetConnectionString("Recibos")));
 
+// Servicios del builder
 builder.Services.AddControllers();
-// Learn more about configuring OpenAPI at https://aka.ms/aspnet/openapi
-builder.Services.AddOpenApi();
+
+// Servicio de Push con Firebase
+builder.Services.AddSingleton<IPushService, PushService>();
+
 
 var app = builder.Build();
 
