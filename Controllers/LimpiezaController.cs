@@ -52,6 +52,24 @@ namespace PalmOasis_Limpieza_Push.Controllers
 			return Ok(lista);
 		}
 
+		// GET: api/limpieza/12391
+		[HttpGet("{id:int}")]
+		public async Task<ActionResult<EventoLimpiezaDto>> GetById(int id, CancellationToken ct)
+		{
+			var e = await _context.EventosLimpieza.AsNoTracking()
+			.FirstOrDefaultAsync(e => e.CodigoId == id, ct);
+
+			if (e is null) return NotFound();
+
+			return Ok(new EventoLimpiezaDto
+			{
+				CodigoId = e.CodigoId,
+				FechaHora = e.FechaHora,
+				Usuario = e.Usuario,
+				Evento = e.Evento
+			});
+		}
+
 		// POST: api/limpieza
 		[HttpPost]
 		public async Task<ActionResult<EventoLimpiezaDto>> CreateLimpiezaGeneral([FromBody] EventoLimpiezaCreateDto nuevo, CancellationToken ct)
