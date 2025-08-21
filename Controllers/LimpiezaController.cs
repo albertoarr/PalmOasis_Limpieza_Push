@@ -8,7 +8,7 @@ using PalmOasis_Limpieza_Push.Models.Interfaces;
 namespace PalmOasis_Limpieza_Push.Controllers
 {
 	[ApiController]
-	[Route("api/[controller]")]
+	[Route("api/limpieza")]
 	public class LimpiezaController : ControllerBase 
 	{
 		private readonly LimpiezaContext _context;
