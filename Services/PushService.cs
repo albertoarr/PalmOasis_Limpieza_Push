@@ -23,7 +23,7 @@ namespace PalmOasis_Limpieza_Push.Services
 			}
 		}
 
-		public Task SendToTopicAsync(string topic, string text, DateTime tsUtc, CancellationToken ct = default)
+		public async Task SendToTopicAsync(string topic, string text, DateTime tsUtc, CancellationToken ct = default)
 		{
 			var data = new Dictionary<string, string>
 			{
@@ -43,7 +43,9 @@ namespace PalmOasis_Limpieza_Push.Services
 				}
 			};
 
-			return FirebaseMessaging.DefaultInstance.SendAsync(msg, ct);
+			var id = await FirebaseMessaging.DefaultInstance.SendAsync(msg, ct);
+
+			Console.WriteLine($"FCM OK id={id} topic={topic} text={text}");
 		}
 	}
 }
