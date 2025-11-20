@@ -16,45 +16,21 @@ using Microsoft.Extensions.Hosting.WindowsServices;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Cargar configuración (appsettings.json)
-// ───────────────────────────────────────────────────────────────────────────────
-builder.Host.ConfigureAppConfiguration((hostingContext, config) =>
-{
-	config.SetBasePath(AppContext.BaseDirectory);
-	config.AddJsonFile("appsettings.json", optional: false, reloadOnChange: true);
-	// Si quieres, añade appsettings.{Environment}.json, user-secrets, etc.
-});
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Ejecutar como servicio de Windows (opcional, quita si no lo necesitas)
-// ───────────────────────────────────────────────────────────────────────────────
 builder.Host.UseWindowsService();
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Configurar Kestrel: HTTP y HTTPS con PFX
-// ───────────────────────────────────────────────────────────────────────────────
-// Ajusta los puertos y la ruta del PFX/contraseña a tu entorno.
-builder.WebHost.ConfigureKestrel(options =>
-{
-	// HTTP
-	options.ListenAnyIP(7059);
 
+builder.WebHost.ConfigureKestrel((context, options) =>
+{
+	options.Configure(context.Configuration.GetSection("Kestrel"));
 });
 
-// ───────────────────────────────────────────────────────────────────────────────
-// Servicios
-// ───────────────────────────────────────────────────────────────────────────────
-
-// EF Core → SQL Server (cadena en appsettings.json: ConnectionStrings:Default)
 builder.Services.AddDbContext<LimpiezaContext>(options =>
 	options.UseSqlServer(builder.Configuration.GetConnectionString("Default"))
 );
 
-// Controllers
 builder.Services.AddControllers();
 
-// CORS (política similar a la que usaste en RRHH)
 builder.Services.AddCors(opt =>
 {
 	opt.AddPolicy("PoliticaPalmOasis", policy =>
@@ -63,7 +39,6 @@ builder.Services.AddCors(opt =>
 			  .AllowAnyMethod());
 });
 
-// Configurar Rate Limiting
 builder.Services.AddMemoryCache();
 builder.Services.Configure<IpRateLimitOptions>(builder.Configuration.GetSection("IpRateLimiting"));
 builder.Services.Configure<IpRateLimitPolicies>(builder.Configuration.GetSection("IpRateLimitPolicies"));
@@ -81,7 +56,6 @@ var app = builder.Build();
 // CORS
 app.UseCors("PoliticaPalmOasis");
 
-// (Si más tarde añades autenticación/autorización, colócalas aquí)
 app.UseAuthorization();
 
 // Controllers
